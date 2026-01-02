@@ -5,7 +5,9 @@ import tensorflow as tf
 from tensorflow import keras
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix,classification_report, precision_recall_fscore_support
+import pandas as pd
+
 DATA_PATH = "data2.json"
 
 def load_data(dataset_path):
@@ -88,6 +90,39 @@ def plot_confusion_matrix(model, x_test, y_test, mapping):
     plt.ylabel('Actual')
     plt.show()
 
+
+def evaluate_model(model, x_test, y_test, mapping):
+    predictions = model.predict(x_test)
+    predicted_indices = np.argmax(predictions, axis=1)
+    report = classification_report(y_test, predicted_indices, target_names=mapping, output_dict=True)
+    df_report = pd.DataFrame(report).transpose()
+    
+    print("\n--- Classification Report ---")
+    print(df_report)
+    return df_report
+
+
+def plot_metrics(report_df, mapping):
+    genres = mapping
+    precision = [report_df.loc[genre]['precision'] for genre in genres]
+    recall = [report_df.loc[genre]['recall'] for genre in genres]
+
+    x = np.arange(len(genres))
+    width = 0.35
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.bar(x - width/2, precision, width, label='Precision', color='#1f77b4')
+    ax.bar(x + width/2, recall, width, label='Recall', color='#ff7f0e')
+
+    ax.set_ylabel('Score')
+    ax.set_title('Precision and Recall by Genre')
+    ax.set_xticks(x)
+    ax.set_xticklabels(genres, rotation=45)
+    ax.legend()
+    plt.tight_layout()
+    plt.show()
+
+
 if __name__ == "__main__":
     #prepare data
     x_train, x_validation, x_test, y_train, y_validation, y_test, mapping = prepare_dataset(0.25, 0.2)
@@ -105,3 +140,6 @@ if __name__ == "__main__":
     print("Model weights saved to music_genre_model.h5")
     
     plot_confusion_matrix(model, x_test, y_test, mapping)
+    report_df = evaluate_model(model, x_test, y_test, mapping)
+
+    plot_metrics(report_df, mapping)
