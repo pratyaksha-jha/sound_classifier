@@ -76,7 +76,17 @@ def predict(model,mapping,x,y):
     predicted_genre = mapping[predicted_index]
     
     print("expected output is: {} , predicted index is : {}".format(expected_genre, predicted_genre))
+
+def plot_confusion_matrix(model, x_test, y_test, mapping):
+    prediction = model.predict(x_test)
+    predicted_indices = np.argmax(prediction, axis=1)
     
+    cm = confusion_matrix(y_test, predicted_indices)
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(cm, annot=True, fmt='d', xticklabels=mapping, yticklabels=mapping)
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.show()
 
 if __name__ == "__main__":
     #prepare data
