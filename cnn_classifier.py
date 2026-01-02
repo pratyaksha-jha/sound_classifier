@@ -3,7 +3,10 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 from tensorflow import keras
-DATA_PATH = "data.json"
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix
+DATA_PATH = "data2.json"
 
 def load_data(dataset_path):
     with open(dataset_path, "r") as fp:
@@ -90,4 +93,5 @@ if __name__ == "__main__":
 
     model.save_weights("music_genre_model.weights.h5")
     print("Model weights saved to music_genre_model.h5")
-     
+    
+    plot_confusion_matrix(model, x_test, y_test, mapping)
